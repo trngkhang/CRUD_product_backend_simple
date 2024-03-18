@@ -1,11 +1,28 @@
+require("dotenv").config();
 const express = require("express");
+const mongoose = require("mongoose");
+const route = require("./routes/index.route");
+
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
+const dbConStr = process.env.DB_CON_STR;
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+// middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+//route
+route(app);
+
+//connect db
+mongoose
+  .connect(dbConStr)
+  .then(() => {
+    console.log("Connected to database!");
+    app.listen(port, () => {
+      console.log(`Server is running on port: ${port}`);
+    });
+  })
+  .catch(() => {
+    console.log("Connection failed!");
+  });
